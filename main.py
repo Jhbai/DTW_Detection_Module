@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.signal import savgol_filter
+import matplotlib.pyplot as plt
 import warnings
 
 class TimeSeriesPatternMatcher:
@@ -141,23 +142,41 @@ if __name__ == "__main__":
     query_normal = pattern[200:250] + np.random.normal(0, 0.1, 50)
     
     # 狀況 2：頻率變快 (Anomaly)
-    t_fast = np.linspace(0, 50 * 1.5, 1000)  # 頻率提升 1.5 倍
-    pattern_fast = np.sin(t_fast)
-    query_fast = pattern_fast[200:250] + np.random.normal(0, 0.1, 50)
+    t_fast = np.linspace(0, 50, 1000)  # 頻率提升 1.5 倍
+    pattern_fast = np.sin(t_fast*1.5)
+    query_fast = pattern_fast[100:250] + np.random.normal(0, 0.1, 150)
     
     # 狀況 3：形狀完全不同 (Anomaly)
     query_diff = np.sign(np.sin(np.linspace(0, 10, 50))) + np.random.normal(0, 0.1, 50) # 方波
 
     matcher = TimeSeriesPatternMatcher(noise_filter_window=11, dtw_radius_ratio=0.05)
+
+    # 觀察原本的 pattern 是什麼樣子
+    plt.plot(pattern, color = "black", label = "original")
+    plt.legend()
+    plt.grid(color="gray", linestyle="--", alpha=.4)
+    plt.show()
     
     print("--- 測試 1: 正常序列 ---")
     res1 = matcher.detect_anomalies(pattern, query_normal)
+    plt.plot(query_normal, color = "blue", label = "normal")
+    plt.legend()
+    plt.grid(color="gray", linestyle="--", alpha=.4)
+    plt.show()
     print(res1)
     
     print("\n--- 測試 2: 頻率變快 (Anomaly) ---")
     res2 = matcher.detect_anomalies(pattern, query_fast)
+    plt.plot(query_fast, color = "orange", label = "freq faster")
+    plt.legend()
+    plt.grid(color="gray", linestyle="--", alpha=.4)
+    plt.show()
     print(res2)
 
     print("\n--- 測試 3: 形狀不同 (Anomaly) ---")
     res3 = matcher.detect_anomalies(pattern, query_diff)
+    plt.plot(query_diff, color = "green", label = "different")
+    plt.legend()
+    plt.grid(color="gray", linestyle="--", alpha=.4)
+    plt.show()
     print(res3)
